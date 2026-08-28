@@ -1,0 +1,3933 @@
+<html lang="ja"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>客人狼 - Identity V Style</title>
+<style>
+    :root {
+        --bg-color: #0b0b0e;
+        --panel-bg: #16161a;
+        --header-bg: #1f1f24;
+        --accent-red: #882b2b;
+        --accent-red-hover: #a83838;
+        --text-color: #e0e0e0;
+        --text-gold: #ffaa00;
+        --border-color: #33333d;
+    }
+    * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+    }
+    body {
+
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+        background-color: var(--bg-color);
+
+        color: var(--text-color);
+
+        margin: 0;
+
+        padding: 0;
+
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+
+        min-height: 100vh;
+
+        overflow: hidden;
+    }
+    #game-container {
+        width: 100vw;
+        max-width: 480px;
+        height: 100vh;
+        height: 100dvh;
+        background: var(--panel-bg);
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        position: relative;
+    }
+    .game-header {
+        background: var(--header-bg);
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+
+        align-items: center;
+
+        border-bottom: 1px solid var(--border-color);
+        flex-shrink: 0;
+        padding-top: max(12px, env(safe-area-inset-top));
+
+    }
+
+    h1 { font-size: 1.1rem; color: #ff5555; margin: 0; }
+
+    .status-info { color: var(--text-gold); font-size: 0.8rem; font-weight: bold; }
+
+    .time-tag { color: #55ff55; font-weight: bold; }
+
+   #view-area {
+
+    position: relative;
+    background: linear-gradient(to bottom, #1a1a24, #0f0f13);
+
+    padding: 12px 15px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+
+    height: 200px;
+
+}
+
+    .location-title { font-size: 1.1rem; color: #fff; font-weight: bold; }
+    .characters-stage {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        align-items: center;
+        flex-grow: 1;
+        -webkit-overflow-scrolling: touch;
+    }
+    .characters-stage::-webkit-scrollbar { display: none; }
+    .chara-card {
+        background: #23232c;
+        border: 1px solid #444;
+        border-radius: 8px;
+        min-width: 90px;
+        height: 130px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        justify-content: space-between;
+
+        padding: 8px 6px;
+
+        flex-shrink: 0;
+
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+
+    }
+    .chara-avatar {
+
+        width: 44px;
+
+        height: 44px;
+
+        background: #3b3b4f;
+
+        border-radius: 50%;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 1.2rem;
+
+        color: #fff;
+
+        border: 2px solid #666;
+    }
+
+    .chara-name { font-size: 0.8rem; font-weight: bold; text-align: center; color: #fff; }
+
+    .chara-actions { display: flex; gap: 4px; width: 100%; }
+
+    .chara-actions button {
+
+        flex: 1;
+
+        font-size: 0.75rem;
+
+        padding: 8px 0;
+
+        margin: 0;
+
+        background: #333;
+
+        border: 1px solid #555;
+
+        color: #fff;
+
+        border-radius: 4px;
+
+        min-height: 36px;
+
+    }
+
+    #output-box {
+
+        background: #111115;
+
+        flex-grow: 1;
+
+        overflow-y: auto;
+
+        padding: 12px 15px;
+
+        font-size: 0.9rem;
+
+        line-height: 1.6;
+
+        border-bottom: 1px solid var(--border-color);
+
+        white-space: pre-wrap;
+
+        -webkit-overflow-scrolling: touch;
+
+    }
+
+    #name-box {
+
+        background: #1c1c24;
+
+        color: var(--text-gold);
+
+        font-weight: bold;
+
+        padding: 8px 12px;
+
+        border-radius: 4px;
+
+        margin-bottom: 8px;
+
+        border-left: 3px solid var(--text-gold);
+
+        display: none;
+
+    }
+
+    #message-box {
+
+        background: #1a1a22;
+
+        padding: 12px;
+
+        border-radius: 6px;
+
+        min-height: 60px;
+
+        border: 1px solid #2a2a35;
+
+        cursor: pointer;
+
+        display: none;
+
+    }
+
+    .novel-message::after {
+
+        content: "▼";
+
+        float: right;
+
+        color: #888;
+
+        font-size: 0.8rem;
+
+        animation: blink 1s infinite;
+
+    }
+
+    @keyframes blink {
+
+        0%, 100% { opacity: 1; }
+
+        50% { opacity: 0.3; }
+
+    }
+
+    #system-log {
+
+        margin-top: 10px;
+
+    }
+
+    #control-panel {
+
+        padding: 12px;
+
+        background: var(--panel-bg);
+
+        display: grid;
+
+        grid-template-columns: repeat(2, 1fr);
+
+        gap: 8px;
+
+        align-items: center;
+
+        flex-shrink: 0;
+
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+
+    }
+
+    button {
+
+        background-color: #2b2b36;
+
+        color: #fff;
+
+        border: 1px solid #444;
+
+        padding: 12px 8px;
+
+        cursor: pointer;
+
+        border-radius: 6px;
+
+        font-size: 0.85rem;
+
+        font-weight: 600;
+
+        touch-action: manipulation;
+
+        min-height: 44px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        transition: background-color 0.1s, transform 0.05s;
+
+    }
+
+    button:active {
+
+        background-color: #3b3b4f;
+
+        transform: scale(0.98);
+
+    }
+
+    button.primary-btn {
+
+        background-color: var(--accent-red);
+
+        border-color: #a83838;
+
+    }
+
+    button.primary-btn:active {
+
+        background-color: var(--accent-red-hover);
+
+    }
+
+    .full-width {
+
+        grid-column: span 2;
+
+    }
+
+    /* Modal / Map Overlay */
+
+    .modal-overlay {
+
+        position: absolute;
+
+        top: 0; left: 0; right: 0; bottom: 0;
+
+        background: rgba(0,0,0,0.85);
+
+        z-index: 100;
+
+        display: flex;
+
+        flex-direction: column;
+
+        justify-content: center;
+
+        padding: 20px;
+
+    }
+
+    .pension-map {
+
+        background: #16161f;
+
+        border: 1px solid #444;
+
+        border-radius: 8px;
+
+        padding: 12px;
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 10px;
+
+    }
+
+    .map-floor-row {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+    }
+
+    .map-floor-label {
+
+        font-size: 0.75rem;
+
+        color: var(--text-gold);
+
+        width: 36px;
+
+        flex-shrink: 0;
+
+        font-weight: bold;
+
+        text-align: center;
+
+    }
+
+    .map-grid-row {
+
+        display: grid;
+
+        gap: 6px;
+
+        flex-grow: 1;
+
+    }
+
+    .map-node {
+
+        background: #252533;
+
+        border: 1px solid #444;
+
+        border-radius: 6px;
+
+        padding: 10px 4px;
+
+        text-align: center;
+
+        font-size: 0.8rem;
+
+        cursor: pointer;
+
+        color: #ddd;
+
+    }
+
+    .map-node:active { background: #3b3b4f; border-color: #ff5555; }
+
+    .map-node.current { background: #1e3a1e; border-color: #55ff55; color: #fff; font-weight: bold; }
+
+    .char-history-box {
+
+        background: #1a1a22;
+
+        border: 1px solid #444;
+
+        border-radius: 6px;
+
+        padding: 8px 10px;
+
+        width: 100%;
+
+        max-height: 80px;
+
+        overflow-y: auto;
+
+        font-size: 0.75rem;
+
+        color: #ccc;
+
+        margin-bottom: 8px;
+
+        grid-column: span 2;
+
+    }
+
+.investigation-meter{
+    display:flex;
+
+    gap:4px;
+
+    align-items:center;
+
+}
+
+.investigation-cell{
+
+    width:10px;
+
+    height:10px;
+
+    border-radius:3px;
+
+    border:1px solid #666;
+
+    background:#2b2b36;
+
+}
+
+.investigation-cell.active{
+
+    background:#ffaa00;
+
+    border-color:#ffcc33;
+
+    box-shadow:0 0 6px rgba(255,170,0,.4);
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="game-container">
+    <div class="game-header">
+        <div>
+            <span id="day-text"></span>
+
+            <span id="time-display" class="time-tag"></span>
+
+        </div>
+
+        <button id="titleBtnHeader" style="min-height:36px; padding: 4px 10px;">🏠</button>
+
+    </div>
+
+    <div id="view-area">
+
+        <div>
+
+            <div class="location-title">氷雪の人狼</div>
+
+        </div>
+
+        <div class="characters-stage"></div>
+
+    </div>
+
+    <div id="output-box">
+
+        <div id="name-box" style="display: none;"></div>
+
+        <div id="message-box" style="display: block;">誰も信じるべきじゃない、自分さえ信じるに値しない</div>
+
+        <div id="system-log"></div>
+
+    </div>
+
+    <div id="control-panel">
+
+        <button id="startBtn" class="primary-btn full-width">はじめから</button>
+
+        <button id="continueBtn" class="full-width">続きから（1日目）</button>
+
+    </div>
+
+</div>
+
+<script>
+
+console.log("SCRIPT START");
+
+window.onerror = function(msg, src, line, col) {
+
+    alert(
+
+        "エラー\n" +
+
+        msg +
+
+        "\n行:" +
+
+        line
+
+    );
+
+};
+
+const charactersData = [
+
+    {
+
+        id: "emma",
+
+        name: "エマ",
+
+        dialogues: {
+
+            1: "庭園の手入れを頼まれて向かう途中だったんだけど……すごい吹雪で道が見えなくなっちゃって。明かりが見えて助かったの！",
+
+            2: "私は庭師のエマ！ 枯れたお花をお手入れしたり、小さなお世話をするのが大好きなの！",
+
+            3: {
+
+                normal: "趣味はかかしさんを作ること！ ボロボロになっても、縫い合わせてあげればまた素敵になるでしょ？",
+
+                creepy: "趣味はかかしさんを作ること！ 動かなくなったお友達を針と糸で縫い合わせあげるの！"
+
+            },
+
+            4: {
+
+                normal: "みんな優しい人ばかりで安心したの！ こんな吹雪の日でも、お話してると少し心があったかくなるの！",
+
+                creepy: "壊れそうなものを見ると放っておけないの。ちゃんと直してあげなきゃって思っちゃうの。"
+
+            },
+
+            5: {
+
+                normal: "早く吹雪がやんで、みんなでおうちに帰れるといいなの。",
+
+                creepy: "壊れてしまったお人形は、もう元には戻らないの。でも……壊れたあとの方が、ずっと愛おしいと思うの"
+
+            },
+
+            6: {
+
+            normal: "こんなに怖い思いをしたのは初めてなの。でも……みんなで帰れるって信じたいの。",
+
+            creepy: "大丈夫。もし誰もいなくなっても寂しくない。ずっと一緒にいてくれるお友達が増えるだけなの。"
+
+            }
+
+        }
+
+    },
+
+    {
+
+        id: "emily",
+
+        name: "エミリー",
+
+        dialogues: {
+
+            1: "往診の帰りに急な猛吹雪に遭ってしまって……。凍えていたところ、こちらの明かりを見つけて救いを求めて参りました。",
+
+            2: "私は医師をしております。どんな患者であれ、傷を癒やし、寄り添うことが私の使命ですから。",
+
+            3: {
+
+                normal: "趣味は薬草の採取と調合です。痛みを和らげる新しい薬を研究することに時間を費やしています。",
+
+                creepy: "趣味は試薬の調合です。ほんの一滴で、人がどんな反応を見せるのか試してみたくなるの。"
+
+            },
+
+            4: {
+
+                normal: "皆さん疲れが溜まっているようですわ。心の不調も放置してはいけませんからね。",
+
+                creepy: "追い詰められた人間の心というものは興味深いわ。普段は見せない本質が顔を出るもの。"
+
+            },
+
+            5: {
+
+                normal: "どなたも体調を崩されていないと良いのですが。何かあれば遠慮なく私を呼んでくださいね。",
+
+                creepy: "人は誰しも、過去に許されない罪を抱えているものよ。それを救ってあげられるのは……完璧な『死』だけなのかも。"
+
+            },
+
+            6: {
+
+            normal: "誰かを疑うのは辛いことですわね……。それでも生きるためには向き合わなければなりません。",
+
+            creepy: "苦しみ続けるより、一瞬で終わった方が幸せな場合もありますよ。案外みなさんもそう思っているのでは？"
+
+            }
+
+        }
+    },
+    {
+        id: "aesop",
+        name: "イソップ",
+        dialogues: {
+            1: "……ご依頼を受けた仕事の途中で、吹雪に遭い……やむを得ず立ち寄らせていただきました……。",
+            2: "……納棺師をしています。ご遺体が最期に見せる、穏やかなお顔を整えるのが……私の務めです。",
+            3: {
+                normal:"……死化粧の道具を研ぐのが趣味です。いつでも……どなたの最期でも、綺麗に整えられるように……。",
+                creepy:  "……化粧箱や道具の手入れをするのが習慣です。一人で静かに集中できる時間ですので……。",
+            },
+            4: {
+                normal:"……穏やかな顔でいられる人は幸せです。最期までそうとは限りませんが……。",
+                creepy:"……人の表情には、その人の歩んできた人生が現れるものですね……。"
+            },
+            5: {
+                normal: "……終焉は、誰にでも平等に訪れます。みなさんも……もうすぐ静かになれるはずですよ……。",
+                creepy: "……大勢でお話をすると心がほっとします。どうか、私のことをもっとを知ってほしい……。"
+            },
+
+            6: {
+
+                normal: "……みなさんのお顔を見ていると分かります。終焉はすぐそこまで来ていますね……。",
+                creepy: "……どうか最後まで希望を捨てないでください。人が安らぎを得るのは……まだ先であってほしい。"
+
+            }
+
+        }
+
+    },
+
+    {
+
+        id: "orpheus",
+        name: "オルフェウス",
+        dialogues: {
+            1: "ある事件の調査でこの近くを訪れていたのだがね。生憎の悪天候だ、しばし雨風を凌がせてもらうよ。",
+
+            2: "私は小説家であり、探偵でもある。人間の複雑な記憶と、そこに隠された真実を解き明かすのが私の仕事だよ。",
+
+           　3: {
+                normal: "趣味はチェスや読書だな。静寂の中で思考の糸を張り巡らせる時間こそ、至高の贅沢だ。",
+                creepy: "趣味は物語の再構築……そう、記憶の改ざんだよ。人の頭の中を私のシナリオ通りに塗り替えるのは実に愉しい。"
+            },
+            4: {
+                normal: "閉ざされた環境では、人間関係の変化が顕著に現れる。観察対象としては興味深いね。",
+                creepy: "極限状態の人間は予想外の行動をする。だから私は人間を書き続けているんだ。"
+            },
+            5: {
+                normal: "この山荘には妙な気配を感じるな。何かあれば私に相談するといい。",
+                creepy: "最後に生き残る物語を書くのは誰だと思う？ ……ふふ、言うまでもなく私だよ。"
+
+            },
+
+            6: {
+
+                normal: "真実は必ず存在する。どれほど複雑な物語であろうと、必ず辿り着けるはずだ。",
+
+                creepy: "人は極限で本性を晒す。今この瞬間ほど、人間という題材が美しく見える時はないよ。"
+
+            }
+
+        }
+
+    },
+
+    {
+
+        id: "norton",
+
+        name: "ノートン",
+
+        dialogues: {
+
+            1: "けっ、炭鉱の仕事の帰りにこんな大吹雪に降られちゃ溜まったもんじゃねぇ。死にたくねぇから入り込ませてもらったぜ。",
+
+            2: "俺は元炭鉱夫だ。地の底で磁石を使って鉱石を探す……危険で泥臭い仕事さ。",
+
+            3: {
+
+                normal: "趣味ねぇ……炭鉱事故の記録を集めることくらいか。人が岩に潰される時の音が、耳から離れねぇんだ。",
+
+                creepy: "趣味？ そんな優雅なもんねぇよ。磁石の引き合う力をぼーっと眺めるくらいだな。"
+
+            },
+
+            4: {
+
+                normal: "こんな吹雪の中じゃ誰だって神経質になるさ。無駄な揉め事はごめんだぜ。",
+
+                creepy: "人間ってのは追い詰められると面白ぇよな。誰を信用するかで顔つきまで変わる。"
+
+            },
+
+            5: {
+
+                normal: "人間なんてのはな、自分の身が危うくなりゃ簡単に仲間を売る汚ぇ生き物なんだよ。",
+
+                creepy: "一銭の金にもならねぇのにこんな場所で立ち往生かよ……ついてねぇ。"
+
+            },
+
+            6: {
+
+                normal: "生き残れりゃそれでいい。だが出来れば誰も犠牲にならねぇ方がいいに決まってる。",
+
+                creepy: "もう皆お互い信用してねぇだろ？ そういう顔を見るのは嫌いじゃねぇな。"
+
+            }
+
+        }
+
+    },
+
+    {
+
+        id: "tracy",
+
+        name: "トレイシー",
+
+        dialogues: {
+
+            1: "新しい機械のパーツを探しに来たんだけど、急に猛吹雪になっちゃって……うう、困っていたから助かったぁ！",
+
+            2: "ボクは機械技師だよ！ 時計や機械装置を分解して、もっとすごい仕組みに組み立て直すのが大好きなの！",
+
+            3: {
+
+                normal: "リモコンで動くロボットの改造が趣味なんだ！ ボクの指示通りに動いてくれるのがすっごく可愛くて！",
+
+                creepy: "趣味は人形の改造だよ。だって心のある人間は裏切るでしょ？ 心を持たない機械の方がずっと信じられるもん。"
+
+            },
+
+            4: {
+
+                normal: "機械だったら故障の原因を探せば直せるんだけど、人の心は難しいよね。",
+
+                creepy: "人間より機械の方が素直だと思わない？ 変な嘘もつかないし。"
+
+            },
+
+            5: {
+
+                normal: "早く吹雪がやんでくれないと、工房に置いてきた機械たちが心配だよぉ……。",
+
+                creepy: "大丈夫、もし全員が動かなくなっても……ボクの玩具たちが代わりに動いてくれるからね！"
+
+            },
+
+            6: {
+
+                normal: "こんな状況でも冷静に考えれば答えは見つかるはずだよ。機械の故障だってそうだもん！",
+
+                creepy: "人間って壊れる時は本当にあっという間だよね。でも壊れた後の方が扱いやすいんだ。"
+
+            }
+
+        }
+
+    },
+
+    {
+
+        id: "helena",
+
+        name: "ヘレナ",
+
+        dialogues: {
+
+            1: "音を頼りに歩いていたのですが、吹雪の音が激しくなってしまって……お邪魔させていただけますでしょうか。",
+
+            2: "点字の本を読み、学問を修めております。目が見えない分、心と耳で世界の真実を感じ取りたいのです。",
+
+            3: {
+
+                normal: "杖で音を鳴らし、その反響を聞くのが好きです。頭の中に、広大な空間の形が思い描かれますから。",
+
+                creepy: "杖の反響を聞くのが好きです。何かが倒れる鈍い音や、壊れる音はとても際立って聞こえるの。"
+
+            },
+
+            4: {
+
+                normal: "皆さんの声を聞いていると、少しずつその人らしさが分かってきます。",
+
+                creepy: "言葉は落ち着いていても、声の震えまでは隠せませんからね……。"
+
+            },
+
+            5: {
+
+                normal: "みなさんの足音が少し不安そうに揺れています……どうかご無事でいてくださいね。",
+
+                creepy: "目が見えない分、私には聞こえるのです。みなさんの心臓が警鐘を鳴らす音が鮮明に。"
+
+            },
+
+            6: {
+
+                normal: "恐怖は伝わっています……でも、それ以上に生きたいという強い意志も聞こえています。",
+
+                creepy: "心臓の音が重なって聞こえる……まるで最後の時を待つ鐘の音みたいに。"
+
+            }
+
+        }
+
+    },
+
+    {
+
+        id: "william",
+
+        name: "ウィリアム",
+
+        dialogues: {
+
+            1: "山道をランニングしてたら一気に視界が真っ白になっちまってさ！ 慌ててこの屋敷に飛び込んだんだ！",
+
+            2: "俺はラグビー選手さ！ 仲間と一緒にボールを追いかけて、全力でぶつかり合うのが最高に熱いんだよ！",
+
+            3: {
+
+                normal: "趣味は筋トレとタックルの練習だな！ 体さえ鍛え上げておけば、どんな困難も吹き飛ばせるぜ！",
+
+                creepy: "趣味は獲物を追い詰めるトレーニングさ。逃げ惑う奴を力任せに叩き潰す爽快感は、何物にも代えられねぇ！"
+
+            },
+
+            4: {
+
+                normal: "チーム競技ってのは信頼が大事なんだ。仲間を疑い始めると勝てなくなる。",
+
+                creepy: "勝負事ってのは残酷でさ。最後に立ってる奴だけが評価されるんだ。"
+
+            },
+
+            5: {
+
+                normal: "はぁ〜腹が減ったな！ 早く吹雪が晴れて、思い切り外を走り回りてぇぜ！",
+
+                creepy: "弱い奴から順に脱落していく……グランドもこの館も、生き残りのルールは同じってことだな！"
+
+            },
+
+            6: {
+
+                normal: "最後まで諦めるな！ 試合終了の笛が鳴るまでは勝負は決まらねぇんだから！",
+
+                creepy: "結局、生き残るのは強い奴だけだ。綺麗事じゃ結果は変わらねぇよ。"
+
+            }
+
+        }
+
+    },
+
+    {
+
+        id: "martha",
+
+        name: "マーサ",
+
+        dialogues: {
+
+            1: "飛行訓練中に天候が急速に悪化してね。機体を降り、救助が来るまでここに避難させてもらうわ。",
+
+            2: "空軍のパイロットを目指しているの。自ら銃を執り、大切なものを守り抜く強さを手に入れるためにね。",
+
+            3: {
+
+                normal: "趣味は信号弾の手入れや射撃訓練よ。どんな緊急事態でも冷静に判断を下せるようにね。",
+
+                creepy: "趣味はターゲットの狙撃のイメージトレーニングよ。動き回る標的を一発で撃ち抜く感覚を研ぎ澄ますの。"
+
+            },
+
+            4: {
+
+                normal: "非常時こそ規律が大切よ。勝手な行動をする人が一番危険なんだから。",
+
+                creepy: "組織では指示に従わない者が混乱を招くの。そういう人間は厄介なのよ。"
+
+            },
+
+            5: {
+
+                normal: "規律を守り、全員で協力して生きてここを出るわよ。私の指示に従いなさい。",
+
+                creepy: "命令に従えない不確定要素（人間）は排除するまでよ。生存のために情けをかける余裕なんてないわ。"
+
+            },
+
+            6: {
+
+                normal: "状況は最悪だけど、まだ終わってはいないわ。最後まで戦い抜くのよ。",
+
+                creepy: "生き残るためなら何を犠牲にするか。その答えを迫られる時が来たようね。"
+
+            }
+
+        }
+
+    },
+
+    {
+
+        id: "mike",
+
+        name: "マイク",
+
+        dialogues: {
+
+            1: "サーカスの巡業途中で道に迷っちゃってさ！ 吹雪で凍え死ぬかと思ったよ～、助かったぁ！",
+
+            2: "ボクは曲芸師のマイク！ ジャグリングや軽業で、みんなに笑顔とビックリを届けるのが大好きなんだ！",
+
+            3: {
+
+                normal: "趣味はお手玉の新しい技を考えること！ 危険なパフォーマンスほど成功した時サイコーに気持ちいいんだ！",
+
+                creepy: "趣味は危険な爆弾の調合だよ！ どんなド派手な火花を散らして人を驚かせるかを考えるの、ワクワクしない？"
+
+            },
+
+            4: {
+
+                normal: "怖い顔してても状況は変わらないって！ 少しは笑った方が得だよ？",
+
+                creepy: "みんなの反応を見てると面白いなぁ。同じ出来事でも表情が全然違うんだもん。"
+
+            },
+
+            5: {
+
+                normal: "こんなシリアスな顔してちゃダメだよ！ ボクが何か楽しいパフォーマンスを見せてあげようか？",
+
+                creepy: "ねえねえ！ 最後のショーステージの『主役』は誰にする？ 一番惨めに泣き叫ぶ人がいいな〜！"
+
+            },
+
+            6: {
+
+                normal: "最後まで笑顔を忘れちゃダメだよ！ 一番苦しい時こそ前を向かなきゃ！",
+
+                creepy: "ショーも終盤だねぇ。誰が最後まで舞台に立っていられるのか楽しみだなぁ！"
+
+            }
+
+        }
+
+    },
+
+    {
+
+        id: "demi",
+
+        name: "デミ",
+
+        dialogues: {
+
+            1: "いなくなった兄さんを探して旅をしてたんだけど……この大雪で立ち往生しちゃってね。参ったわ。",
+
+            2: "バーテンダーをやっているの。極上のお酒で、疲れきったお客さんの心を癒やしてあげるのが私の仕事よ。",
+
+            3: {
+
+                normal: "趣味は新しいカクテルのレシピ作り。「ドルフリン」っていう、とっておきのお酒があるのよ。",
+
+                creepy: "趣味は特別な薬品を混ぜたカクテル作り。一口飲むだけで、痛みを忘れて永遠に眠れるの……ふふ。"
+
+            },
+
+            4: {
+
+                normal: "お酒の席だと人は本音を話しやすくなるものよ。面白いくらいにね。",
+
+                creepy: "人の警戒心って案外脆いの。少し安心するとすぐ隙を見せるんだから。"
+
+            },
+
+            5: {
+
+                normal: "みんなそんな難しい顔してちゃダメよ。こんな寒い夜こそ、一杯飲んで落ち着かなくっちゃ。",
+
+                creepy: "グラスに毒が混ざっているかも……なんて疑ってたら、何も飲めなくなっちゃうわよ？ うふふ。"
+
+            },
+
+            6: {
+
+                normal: "怖いなら怖いって言えばいいのよ。こんな夜に平気な人なんていないんだから。",
+
+                creepy: "皆ずいぶん疲れた顔ね。少し眠れば楽になれるかもしれないわよ……永遠にね。"
+
+            }
+
+        }
+
+    },
+
+    {
+
+        id: "patricia",
+
+        name: "パトリシア",
+
+        dialogues: {
+
+            1: "呪術の導きに従いこの地を訪れましたが……この吹雪は、運命が与えた試練のようですわね。",
+
+            2: "呪術師として、血脈に流れる力を受け継いでいます。呪いは他者を害するだけでなく、護るためにも使うものです。",
+
+            3: {
+
+                normal: "趣味は魔除けの像を彫ることです。心を研ぎ澄ませ、静かに祈りを捧げる時間なのです。",
+
+                creepy: "趣味は呪いの像に負の感情を注ぎ込むことです。思いが強ければ強いほど、力が宿りますの。"
+
+            },
+
+            4: {
+
+                normal: "この館には良くない気配があります。でも恐れるだけでは運命に呑まれてしまいますわ。",
+
+                creepy: "負の感情には力がありますの。不安や憎しみほど強い力はありませんから。"
+
+            },
+
+            5: {
+
+                normal: "この館には邪悪な気配が満ちています……みなさんもどうかお気をつけなさい。",
+
+                creepy: "呪いはすでに解き放たれていますわ。逃れられない死の恐怖に、せいぜい身を震わせなさい。"
+
+            },
+
+            6: {
+
+                normal: "運命は決して定められたものではありませんわ。未来はまだ選べます。",
+
+                creepy: "絶望の色が濃くなってきましたわね。呪いもきっと強力になりますわ。"
+
+            }
+
+        }
+
+    },
+
+    {
+
+        id: "andrew",
+
+        name: "アンドルー",
+
+        dialogues: {
+
+            1: "……冷たい墓地を出て宛てもなく歩いていたところ、吹雪になり……ここに辿り着きました……。",
+
+            2: "……墓守をしています。静かな墓地で穴を掘り、永遠の眠りにつく方々を冷たい土で包むのが……私の仕事です。",
+
+            3: {
+
+                normal: "……スコップを手入れするのが習慣です。土を掘り返す感触だけが、私の荒んだ心を落ち着かせてくれます。",
+
+                creepy: "……埋葬の準備をするのが趣味です。みなさん一人ひとりの体のサイズに合う穴を……あらかじめ掘っておくのです。"
+
+            },
+
+            4: {
+
+                normal: "……人は死を恐れますが、私にはその気持ちが少し分からないのです……。",
+
+                creepy: "……皆さん、生きることに必死ですね……。見ていると少し羨ましくなります……。"
+
+            },
+
+            5: {
+
+                normal: "……私は白眼視される忌まわしき存在です。みなさんの視界に入らぬよう、影に潜んでおります……。",
+
+                creepy: "……誰もが私を化け物と呼び拒絶します。ならば……その期待通りの化け物になるのが礼儀かもしれません……。"
+
+            },
+
+            6: {
+
+                normal: "……こんな私でも、皆さんが無事に帰れることを願っています……本心です……。",
+
+                creepy: "……生者の世界は騒がしいですね……。もう少しで皆さんも静寂の意味を理解できるでしょう……。"
+
+            }
+
+        }
+
+    }
+
+];
+
+// キャラクターごとの固有セリフ辞書
+
+const CHARACTER_DIALOGUES = {
+
+    "エマ": {
+
+        talk: "エマ「なあに？私でよければお話するの！」",
+
+        inspect: "エマ「なあに？私のお洋服に何か付いてるの？」",
+
+        alibi: (loc) => `エマ「昨日はずっと${loc}にいたの。お花の手入れができなくて退屈だったの。」`,
+
+        witness: (target, loc) => target ? `エマ「昨日ね、${loc}で${target}さんを見かけたの！」` : `エマ「う〜ん、昨日は特に誰も見かけなかったの。」`,
+
+        execution: "エマ「いやあぁっ！お父さん、助けて……！！」"
+
+    },
+
+    "エミリー": {
+
+        talk: "エミリー「何かお困りですか？」",
+
+        inspect: "エミリー「あまりジロジロ見ないでいただけますか？診察が必要なのはあなたの方では？」",
+
+        alibi: (loc) => `エミリー「昨日は${loc}におりました。間違ありませんわ。」`,
+
+        witness: (target, loc) => target ? `エミリー「昨日は${loc}で${target}さんをお見かけしましたよ。」` : `エミリー「昨日は特にどなたもお見かけしませんでしたね。」`,
+
+        execution: "エミリー「私が……間違っていたの……？申し訳ありません……」"
+
+    },
+
+    "イソップ": {
+
+        talk: "イソップ「私に何か御用ですか……。」",
+
+        inspect: "イソップ「……あまり近くに寄らないでください。視線が、不快です……。」",
+
+        alibi: (loc) => `イソップ「……昨日は${loc}におりました。一人で……。」`,
+
+        witness: (target, loc) => target ? `イソップ「……昨日、${loc}で${target}さんを見かけました……。」` : `イソップ「……特に誰も見かけませんでした……。」`,
+
+        execution: "イソップ「……最後のお別れですね。どうか安らかに……。」"
+
+    },
+
+    "オルフェウス": {
+
+        talk: "オルフェウス「ふむ、何か気になることでもあるのかい？」",
+
+        inspect: "オルフェウス「おや、私の顔に何か面白いプロットでも書いてあるのかな？」",
+
+        alibi: (loc) => `オルフェウス「昨日は${loc}で執筆の構想を練っていたよ。」`,
+
+        witness: (target, loc) => target ? `オルフェウス「昨日、${loc}で${target}さんの姿を見かけたよ。」` : `オルフェウス「昨日は特に誰も見かけなかったな。」`,
+
+        execution: "オルフェウス「くっ……！私の物語が、こんなバッドエンドで終わるというのか……！？」"
+
+    },
+
+    "ノートン": {
+
+        talk: "ノートン「なんだ？話だけなら聞いてやる。」",
+
+        inspect: "ノートン「……何見てんだよ。磁石でも探してんのか？」",
+
+        alibi: (loc) => `ノートン「昨日はずっと${loc}だ。暗くて落ち着く場所だったぜ。」`,
+
+        witness: (target, loc) => target ? `ノートン「昨日、${loc}で${target}を見かけたぜ。」` : `ノートン「特に誰も見かけなかったな。」`,
+
+        execution: "ノートン「ちくしょう……！また俺だけが、暗闇に取り残されるのか……！」"
+
+    },
+
+    "トレイシー": {
+
+        talk: "トレイシー「おっ、ボクに何の用？」",
+
+        inspect: "トレイシー「えっ、何？ボクの機械人形に何かトラブルでもあった！？」",
+
+        alibi: (loc) => `トレイシー「昨日は${loc}で回路のチェックをしてたよ。」`,
+
+        witness: (target, loc) => target ? `トレイシー「昨日、${loc}で${target}さんを見かけたよ！」` : `トレイシー「昨日は特に誰も見かけなかったかな。」`,
+
+        execution: "トレイシー「嫌だぁ！故障しちゃう、助けてお父さん！！」"
+
+    },
+
+    "ヘレナ": {
+
+        talk: "ヘレナ「はい……お話を聞かせていただけますか？」",
+
+        inspect: "ヘレナ「あ……近くに気配を感じます。私に何かご用でしょうか？」",
+
+        alibi: (loc) => `ヘレナ「昨日は${loc}におりました。杖の響きで間違いございません。」`,
+
+        witness: (target, loc) => target ? `ヘレナ「昨日、${loc}で${target}さんの気配を感じました。」` : `ヘレナ「昨日は特にどなたの気配もしませんでした。」`,
+
+        execution: "ヘレナ「何も見えなくても……痛いのは分かります……っ！」"
+
+    },
+
+    "ウィリアム": {
+
+        talk: "ウィリアム「おう！しけたツラしてんな！」",
+
+        inspect: "ウィリアム「なんだなんだ？俺の筋肉に見とれてんのか！？」",
+
+        alibi: (loc) => `ウィリアム「昨日は${loc}で筋トレをしてたぜ！汗びっしょりだ！」`,
+
+        witness: (target, loc) => target ? `ウィリアム「昨日、${loc}で${target}を見かけたぜ！」` : `ウィリアム「特に誰も見かけなかったぞ！」`,
+
+        execution: "ウィリアム「ぐあぁっ！？俺のタックルが……間に合わねぇ……！」"
+
+    },
+
+    "マーサ": {
+
+        talk: "マーサ「報告かしら？早く聞かせて。」",
+
+        inspect: "マーサ「規律を乱さないでちょうだい。私に何か異常でも？」",
+
+        alibi: (loc) => `マーサ「昨日は${loc}の警戒任務についていました。」`,
+
+        witness: (target, loc) => target ? `マーサ「昨日、${loc}で${target}を見かけたわ。」` : `マーサ「特に不審な人物は見かけなかったわ。」`,
+
+        execution: "マーサ「引き金を引くのが早すぎるわ……！後悔するわよ……！」"
+
+    },
+
+    "マイク": {
+
+        talk: "マイク「やあ！楽しいことでもあった？」",
+
+        inspect: "マイク「おっと！僕の顔に何か面白い仕掛けでも隠してあるように見えるかい？」",
+
+        alibi: (loc) => `マイク「昨日は${loc}でジャグリングの練習をしてたんだよ！」`,
+
+        witness: (target, loc) => target ? `マイク「昨日、${loc}で${target}さんを見かけたよ！」` : `マイク「昨日は誰も見かけなかったな〜。」`,
+
+        execution: "マイク「うそでしょ！？こんなの、ちっとも面白くないよ〜〜っ！！」"
+
+    },
+
+    "デミ": {
+
+        talk: "デミ「いいね、おしゃべりしようじゃないか。」",
+
+        inspect: "デミ「なにかい？アタシの顔より、この極上の酒の方が魅力的だと思うけど？」",
+
+        alibi: (loc) => `デミ「昨日は${loc}で極上の酒を寝かせてたのさ。」`,
+
+        witness: (target, loc) => target ? `デミ「昨日、${loc}で${target}を見かけたよ。」` : `デミ「昨日は誰も見かけなかったねぇ。」`,
+
+        execution: "デミ「あんた……酒の味も分からないで、酷いことするじゃないか……！」"
+
+    },
+
+    "パトリシア": {
+
+        talk: "パトリシア「運命の導きに従って話しましょう。」",
+
+        inspect: "パトリシア「……無礼ね。私の猿の魔除けが不気味だとでも言いたいの？」",
+
+        alibi: (loc) => `パトリシア「昨日は${loc}で祈りを捧げていました。」`,
+
+        witness: (target, loc) => target ? `パトリシア「昨日、${loc}で${target}を見かけたわ。」` : `パトリシア「昨日は誰の姿も見ていないわ。」`,
+
+        execution: "パトリシア「この怨念は……あなたをどこまでも追い続けるわ……！」"
+
+    },
+
+    "アンドルー": {
+
+        talk: "アンドルー「……僕なんかで良ければ、お話します……。」",
+
+        inspect: "アンドルー「……僕の不吉な姿を見て侮蔑しているのでしょう？分かっています……。」",
+
+        alibi: (loc) => `アンドルー「……昨日は${loc}の隅でひっそりとしておりました……。」`,
+
+        witness: (target, loc) => target ? `アンドルー「……昨日、${loc}で${target}さんを見かけました……。」` : `アンドルー「……昨日は誰も見かけませんでした……。」`,
+
+        execution: "アンドルー「……ああ、ついに僕の墓穴が掘られたのですね……。」"
+
+    }
+
+};
+
+class Character {
+
+    constructor(name) {
+
+        this.name = name;
+
+        this.alive = true;
+
+        this.role = "human";
+
+        this.lastTalkDay = 0;
+
+        this.location = "ロビー";
+
+        this.yesterdayLocation = "";
+
+        this.fakeYesterdayLocation = "";
+
+        this.witnessTarget = null;
+
+        this.witnessLocation = "";
+
+        this.dialogueHistory = [];
+
+        this.memo = { inspected: {} };
+
+        this.signs = { eye:false, claw:false, fang:false, temp:false, tail:false };
+
+        this.knownSigns = { eye:null, claw:null, fang:null, temp:null, tail:null };
+
+    }
+
+}
+
+class Game {
+
+    constructor() {
+
+        this.day = 1;
+
+        this.timeState = "昼";
+
+        this.radioListenedToday = false;
+
+        this.phoneUsedToday = false;
+
+        this.hunterOrderGivenToday = false;
+
+        this.hasExecutedToday = false;
+
+        this.hasFoundAbnormalToday = false;
+
+        this.maxDays = 7;
+
+        this.shotLimit = 6;
+
+        this.penaltyBonus = 0;
+
+        this.investigationCount = 0;
+
+        this.playerLocation = "管理人室";
+
+        this.isGameOver = false;
+
+        this.executionUnlocked = false;
+
+        this.madmanAwakened = false;
+
+        this.playerAwakened = false;
+
+        this.hunterRevealed = false;
+
+        this.hunterGuardTarget = null;
+
+        this.secondVictimOccurred = false;
+
+        this.eventPlaying = false;
+
+        this.learnedSigns = { eye: false, claw: false, fang: false, temp: false, tail: false };
+
+        this.characters = [
+
+            new Character("あなた"),
+
+            new Character("エマ"),
+
+            new Character("エミリー"),
+
+            new Character("イソップ"),
+
+            new Character("オルフェウス"),
+
+            new Character("ノートン"),
+
+            new Character("トレイシー"),
+
+            new Character("ヘレナ"),
+
+            new Character("ウィリアム"),
+
+            new Character("マーサ"),
+
+            new Character("マイク"),
+
+            new Character("デミ"),
+
+            new Character("パトリシア"),
+
+            new Character("アンドルー")
+
+        ];
+
+        this.assignWolves();
+
+        this.assignRoles();
+
+        this.assignSigns();
+
+        this.assignLocations();
+
+        this.generateAlibisAndWitnesses();
+
+    }
+
+startNight() {
+
+    this.timeState = "夜";
+
+    updateUI();
+
+    log("\n夜になった。");
+
+    log("全員寝静まっているはずだ。");
+
+    this.nightAttack();
+
+    this.advanceDay();
+
+}
+
+    get maxInvestigationLimit() {
+
+        return Math.max(1, 7 - (this.day - 1)) + this.penaltyBonus;
+
+    }
+
+    assignWolves() {
+
+        const pool = this.characters.filter(c => c.name !== "あなた").sort(() => Math.random() - 0.5);
+
+        for (let i = 0; i < 3; i++) { if(pool[i]) pool[i].role = "wolf"; }
+
+    }
+
+    assignRoles() {
+
+        const hunterCandidates = ["ウィリアム", "マーサ"];
+
+        const hunterName = hunterCandidates[Math.floor(Math.random() * hunterCandidates.length)];
+
+        const hunter = this.characters.find(c => c.name === hunterName && c.role === "human");
+
+        if(hunter) hunter.role = "hunter";
+
+        const madmanPool = this.characters.filter(c => c.role === "human" && c.name !== "あなた" && c.role !== "hunter");
+
+        if(madmanPool.length > 0) {
+
+            const madman = madmanPool[Math.floor(Math.random() * madmanPool.length)];
+
+            madman.role = "madman";
+
+        }
+
+    }
+
+    assignSigns() {
+
+        const signList = ["eye", "claw", "fang", "temp"];
+
+        this.characters.forEach(c => {
+
+            if(c.name === "あなた") {
+
+                c.signs.eye = true;
+
+                return;
+
+            }
+
+            if(c.role === "madman") return;
+
+            if(c.role === "wolf") {
+
+                const shuffled = [...signList].sort(() => Math.random() - 0.5);
+
+                const count = 2 + Math.floor(Math.random() * 2);
+
+                for(let i = 0; i < count; i++) { c.signs[shuffled[i]] = true; }
+
+                return;
+
+            }
+
+            const abnormal = signList[Math.floor(Math.random() * signList.length)];
+
+            c.signs[abnormal] = true;
+
+        });
+
+    }
+
+    assignLocations() {
+
+        this.characters.forEach(c => {
+
+            if (c.name !== "あなた") {
+
+                const commonLocs = [
+
+    "ロビー",
+
+    "食堂",
+
+    "暖炉前",
+
+    "図書室",
+
+    "展望テラス",
+
+    "ボイラー室",
+
+    "倉庫"
+
+];
+
+                c.location = commonLocs[Math.floor(Math.random() * commonLocs.length)];
+
+                c.yesterdayLocation = commonLocs[Math.floor(Math.random() * commonLocs.length)];
+
+            }
+
+        });
+
+        this.enforceLocationLimits();
+
+    }
+
+    enforceLocationLimits() {
+
+        const locations = [
+
+    "ロビー",
+
+    "食堂",
+
+    "暖炉前",
+
+    "図書室",
+
+    "展望テラス",
+
+    "ボイラー室",
+
+    "倉庫"
+
+];
+
+        let changed = true;
+
+        while(changed) {
+
+            changed = false;
+
+            for(const loc of locations) {
+
+                let people = this.characters.filter(c => c.alive && c.name !== "あなた" && c.location === loc);
+
+                while(people.length > 3) {
+
+                    const moved = people.pop();
+
+                    const available = locations.filter(l => this.characters.filter(c => c.alive && c.name !== "あなた" && c.location === l).length < 3);
+
+                    if(available.length === 0) break;
+
+                    moved.location = available[Math.floor(Math.random() * available.length)];
+
+                    changed = true;
+
+                }
+
+            }
+
+        }
+
+    }
+
+    generateAlibisAndWitnesses() {
+
+        const commonLocs = [
+
+    "ロビー",
+
+    "食堂",
+
+    "暖炉前",
+
+    "図書室",
+
+    "展望テラス",
+
+    "ボイラー室",
+
+    "倉庫"
+
+];
+
+        const aliveOthers = this.characters.filter(c => c.name !== "あなた" && c.alive);
+
+        aliveOthers.forEach(c => {
+
+            if (c.role === "wolf") {
+
+                const otherLocs = commonLocs.filter(l => l !== c.yesterdayLocation);
+
+                c.fakeYesterdayLocation = otherLocs[Math.floor(Math.random() * otherLocs.length)];
+
+                const targets = aliveOthers.filter(t => t !== c);
+
+                if (targets.length > 0) {
+
+                    const victim = targets[Math.floor(Math.random() * targets.length)];
+
+                    c.witnessTarget = victim.name;
+
+                    c.witnessLocation = commonLocs[Math.floor(Math.random() * commonLocs.length)];
+
+                } else {
+
+                    c.witnessTarget = null;
+
+                    c.witnessLocation = "";
+
+                }
+
+            } else {
+
+                c.fakeYesterdayLocation = c.yesterdayLocation;
+
+                const targets = aliveOthers.filter(t => t !== c);
+
+                if (targets.length > 0) {
+
+                    const seen = targets[Math.floor(Math.random() * targets.length)];
+
+                    c.witnessTarget = seen.name;
+
+                    c.witnessLocation = seen.yesterdayLocation;
+
+                } else {
+
+                    c.witnessTarget = null;
+
+                    c.witnessLocation = "";
+
+                }
+
+            }
+
+        });
+
+    }
+
+    getAlive() { return this.characters.filter(c => c.alive); }
+
+    getAliveWolves() { return this.characters.filter(c => c.alive && c.role === "wolf"); }
+
+    getAliveHumans() {
+
+        return this.characters.filter(c => c.alive && c.name !== "あなた" && c.role !== "wolf" && !(c.role === "madman" && this.madmanAwakened));
+
+    }
+
+    getCharactersAtLocation(loc) { return this.getAlive().filter(c => c.name !== "あなた" && c.location === loc); }
+
+    movePlayer(loc) {
+
+        this.playerLocation = loc;
+
+        const present = this.getCharactersAtLocation(loc);
+
+        let msg = `\n「${loc}」へ移動した。`;
+
+        if (loc !== "管理人室") {
+
+            if (present.length > 0) {
+
+                const names = present.map(p => p.name).join("、");
+
+                msg += `そこには ${names} がいた。`;
+
+            } else {
+
+                msg += `そこには誰もいなかった。`;
+
+            }
+
+        }
+
+        log(msg);
+
+        saveGame();
+
+        updateUI();
+
+    }
+
+    investigate(character, signType) {
+
+        if (this.isGameOver) return;
+
+        if (this.investigationCount >= this.maxInvestigationLimit) { log("\n>> 本日の調査限界に達した。"); return; }
+
+        this.investigationCount++;
+
+        const limit = this.maxInvestigationLimit;
+
+        if (limit - this.investigationCount === 1) {
+
+            log("\n⚠️【警告】本日の調査上限まで残り1回です！");
+
+        }
+
+        const labels = { eye:"眼", claw:"爪", fang:"牙", temp:"体温", tail:"尻尾" };
+
+        let preInspectText = "";
+
+        if (character.name === "あなた") {
+
+            preInspectText = "鏡に自分の姿を映した。";
+
+        } else if (CHARACTER_DIALOGUES[character.name]) {
+
+            preInspectText = CHARACTER_DIALOGUES[character.name].inspect;
+
+        } else {
+
+            preInspectText = `${character.name}「なんだよ、人の顔ばかりジロジロ見やがって……」`;
+
+        }
+
+        const isAbnormal = character.signs[signType];
+
+        character.knownSigns[signType] = isAbnormal;
+
+        character.memo.inspected[signType] = true;
+
+        const inspectResultText = isAbnormal ? `【調査：${labels[signType]}】⇒ 異常反応を発見！` : `【調査：${labels[signType]}】⇒ 異常なし。`;
+
+        addHistory(character, inspectResultText);
+
+        if (isAbnormal) {
+
+    if(character.name === "あなた"){
+
+        log("⇒ くそ、眼が赤い・・・");
+
+        saveGame();
+
+        updateUI();
+
+        return;
+
+    }
+
+    playSE("found");
+
+    log("⇒ 【異常反応を発見した！】\n");
+
+    log(`【警告】${character.name}に異常反応を検出。処刑するか、見逃すか選択してください。`);
+
+    this.hasFoundAbnormalToday = true;
+
+    saveGame();
+
+    updateUI();
+
+    showAbnormalFoundMenu(character);
+
+    return;
+
+}
+
+   else {
+
+            log("⇒ 特に異常はないようだ。");
+
+        }
+
+        saveGame();
+
+        updateUI();
+
+    }
+
+    execution(target) {
+
+        if (this.hasExecutedToday) return;
+
+        if(this.hunterGuardTarget === target.name) {
+
+            const hunter = this.characters.find(c => c.role === "hunter" && c.alive);
+
+            if(hunter) {
+
+                log("");
+
+                if(hunter.name === "ウィリアム") {
+
+                    log("ウィリアム『おいおい！護衛対象に指定した奴を撃っちまうなんてどういうつもりだ！？再指示をくれ！』");
+
+                } else {
+
+                    log("マーサ『護衛任務を与えた相手を射殺するなんて……！指示をやり直しなさい！』");
+
+                }
+
+            }
+
+            this.hunterGuardTarget = null;
+
+            this.hunterOrderGivenToday = false;
+
+        }
+
+        target.alive = false;
+
+        this.shotLimit--;
+
+        this.hasExecutedToday = true;
+
+        this.hasFoundAbnormalToday = false;
+
+        let deathCry = CHARACTER_DIALOGUES[target.name] ? CHARACTER_DIALOGUES[target.name].execution : `${target.name}「や、やめろ！助けてくれ！！」`;
+
+        playSE("gun");
+
+        log(`\n${deathCry}\nあなたは猟銃を構えた。……バァン！！\n${target.name}は崩れ落ちた。\n`);
+
+        if(target.role === "wolf") {
+
+            log("突然身体が膨れ上がる。骨が軋み、毛皮が全身を覆った。それは紛れもなく――【人狼】だった。");
+
+        } else {
+
+            log("そこに倒れていたのはただの人間だった。あなたは言葉を失った。");
+
+        }
+
+        saveGame();
+
+        this.checkWinCondition();
+
+        updateUI();
+
+    }
+
+    nightAttack() {
+
+        const victims = this.characters.filter(c => c.alive && c.name !== "あなた" && c.role !== "wolf" && c.role !== "hunter" && !(c.role === "madman" && this.day <= 2));
+
+        if(victims.length === 0) return;
+
+        const target = victims[Math.floor(Math.random() * victims.length)];
+
+        if(target.role === "madman" && !this.madmanAwakened) {
+
+    this.madmanAwakened = true;
+
+    // 狂人を人狼化
+
+    target.role = "wolf";
+
+    log("\n【夜の異変】");
+
+    log("どこかで狼の遠吠えが聞こえた。");
+
+    log("だが不気味なほどに静かだ……今朝は誰も死亡していない。");
+
+    log("");
+
+    this.checkWinCondition();
+
+    return;
+
+}
+
+        if(this.hunterGuardTarget === target.name) {
+
+            const hunter = this.characters.find(c => c.role === "hunter" && c.alive);
+
+            if(hunter) {
+
+                hunter.alive = false;
+
+                log(`\n【夜の悲劇】\n${hunter.name}が${target.name}をかばって死亡した。\n`);
+
+                this.hunterGuardTarget = null;
+
+                return;
+
+            }
+
+        }
+
+        target.alive = false;
+
+playSE("howl");
+
+setTimeout(() => {
+
+    log(`\n今朝、${target.name}が無残な姿で発見された……。`);
+
+}, 2500);
+
+this.hunterGuardTarget = null;
+
+this.checkWinCondition();
+
+}
+
+    revealAllRoles() {
+
+        const roleLabels = {
+
+            wolf: "人狼",
+
+            madman: "狂人",
+
+            hunter: "狩人",
+
+            human: "市民"
+
+        };
+
+        const rolePriority = {
+
+            wolf: 1,
+
+            madman: 2,
+
+            hunter: 3,
+
+            human: 4
+
+        };
+
+        log("\n========== 【全役職公開】 ==========");
+
+        // 優先度順（人狼、狂人、狩人、市民）にソートして表示
+
+        const sortedList = [...this.characters]
+
+            .filter(c => c.name !== "あなた")
+
+            .sort((a, b) => (rolePriority[a.role] || 99) - (rolePriority[b.role] || 99));
+
+        sortedList.forEach(c => {
+
+            const status = c.alive ? "生存" : "死亡";
+
+            log(`・${c.name} ⇒ ${roleLabels[c.role] || c.role}（${status}）`);
+
+        });
+
+        log("====================================\n");
+
+    }
+
+    checkWinCondition() {
+
+        const wolves = this.getAliveWolves();
+
+        const humans = this.getAliveHumans();
+
+        if (wolves.length === 0) {
+
+            this.isGameOver = true;
+
+            log("\n=================\n【エンディング：人間の勝利】\n全ての人狼を排除した！\n=================");
+
+            this.revealAllRoles();
+
+            clearSaveData();
+
+            showGameOverControls();
+
+            return true;
+
+        }
+
+        const madmanAlive = this.characters.some(c => c.alive && c.role === "madman" && this.madmanAwakened);
+
+        const evilCount = wolves.length + (madmanAlive ? 1 : 0);
+
+        if(evilCount >= humans.length) {
+
+            this.isGameOver = true;
+
+            log("\n=================\n【エンディング：人狼の勝利】\n生存する人間が人狼以下になった……。\n=================");
+
+            this.revealAllRoles();
+
+            clearSaveData();
+
+            showGameOverControls();
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+    advanceDay() {
+
+if (
+
+    this.day === 1 &&
+
+    !this.phoneUsedToday
+
+) {
+
+    log("\n📞救助要請しておこう。");
+
+    return;
+
+}
+
+    if (this.isGameOver) return;
+
+    this.day++;
+
+        if(this.day === 3) {
+
+            const hunter = this.characters.find(c => c.role === "hunter" && c.alive);
+
+            if(hunter && !this.hunterRevealed) {
+
+                this.hunterRevealed = true;
+
+                if(hunter.name === "ウィリアム") {
+
+                    log("\nウィリアム『俺はハンター（狩人）だ！今夜守るターゲットを指定してくれ！』\n");
+
+                } else {
+
+                    log("\nマーサ『私はハンターよ。今夜、誰を防衛すればいいか指示を出しなさい。』\n");
+
+                }
+
+            }
+
+        }
+
+        if(this.day >= 2) this.learnedSigns.eye = true;
+
+        if(this.day >= 3) this.learnedSigns.claw = true;
+
+        if(this.day >= 4) this.learnedSigns.fang = true;
+
+        if(this.day >= 5) this.learnedSigns.temp = true;
+
+        if(this.day >= 6) this.learnedSigns.tail = true;
+
+        if(this.day >= 5) {
+
+            this.characters.forEach(c => { if(c.alive && c.role === "wolf") c.signs.tail = true; });
+
+        }
+
+        if (this.day > this.maxDays) {
+
+            this.isGameOver = true;
+
+            log("\n=================\n【エンディング：タイムアップ】\n救援が来たが人狼を見つけられなかった。\n=================");
+
+            this.revealAllRoles();
+
+            clearSaveData();
+
+            showGameOverControls();
+
+            return;
+
+        }
+
+        this.timeState = "昼";
+
+        this.hasExecutedToday = false;
+
+        this.hasFoundAbnormalToday = false;
+
+        this.investigationCount = 0;
+
+        this.radioListenedToday = false;
+
+        this.phoneUsedToday = false;
+
+        this.hunterOrderGivenToday = false;
+
+        this.characters.forEach(c => {
+
+            if (c.name !== "あなた" && c.alive) {
+
+                c.yesterdayLocation = c.location;
+
+                const commonLocs = [
+
+    "ロビー",
+
+    "食堂",
+
+    "暖炉前",
+
+    "図書室",
+
+    "展望テラス",
+
+    "ボイラー室",
+
+    "倉庫"
+
+];
+
+                c.location = commonLocs[Math.floor(Math.random() * commonLocs.length)];
+
+            }
+
+        });
+
+        this.enforceLocationLimits();
+
+        this.generateAlibisAndWitnesses();
+
+        log(`\n=== DAY ${this.day} ===\n`);
+
+        saveGame();
+
+        updateUI();
+
+    }
+
+     playRadioBroadcast(){
+
+     playSE("radio");
+
+        log("");
+
+        log("📻【KNHラジオ】");
+
+        log("『今週の伝説の生物特集』");
+
+        log("");
+
+        log("司会");
+
+        log("『ｻﾞｻﾞｯ・・・今週も始まりました伝説の生物特集！本日より数日間に渡って人狼を研究している博士にお話を伺います。』");
+
+        log("");
+
+        log("司会");
+
+        log("『では、博士よろしくお願いします。』");
+
+        log("");
+
+        if(this.day === 1){
+
+            log("博士"); log("『お願いします。』"); log("");
+
+            log("司会"); log("『早速ですが、人狼の特徴を教えてください。』"); log("");
+
+            log("博士"); log("『人狼の眼は真っ赤に充血しています！』"); log("");
+
+            log("司会"); log("『なるほど！・・・えーっと"); log("");
+
+            log("司会"); log("『それって寝不足なだけでは？』"); log("");
+
+            log("博士"); log("『違います。人狼は夜な夜な獲物を狙うため徘徊しているのです！』"); log("");
+
+            log("司会"); log("『なるほど！寝不足だと人狼に疑われるかもしれません。』"); log("");
+
+            log("司会"); log("『皆さんも睡眠はしっかり取るよう心掛けましょう。』"); log("");
+
+            this.learnedSigns.eye = true;
+
+            log(""); log("【新しい調査方法】"); log("『眼』の調査が可能になった。"); log("");
+
+        }
+
+        else if(this.day === 2){
+
+            log("司会"); log("『人狼特集第二回です。』"); log("");
+
+            log("博士"); log("『人狼の爪は非常に鋭いです！』"); log("");
+
+            log("司会"); log("『切っていないだけでは？』"); log("");
+
+            log("博士"); log("『違います。獲物を切り裂くためです！』"); log("");
+
+            log("司会"); log("『面倒くさがり屋の可能性もありますね。』");
+
+            log("司会"); log("『皆さんも疑われないよう身だしなみには気を付けましょう！』"); log("");
+
+            this.learnedSigns.claw = true;
+
+            log(""); log("【新しい調査方法】"); log("『爪』の調査が可能になった。"); log("");
+
+        }
+
+        else if(this.day === 3){
+
+            log("司会"); log("『特集第三回です。』"); log("");
+
+            log("博士"); log("『人狼には鋭い牙があります！』"); log("");
+
+            log("司会"); log("『それって八重歯では？』"); log("");
+
+            log("博士"); log("『人狼です！』"); log("");
+
+            log("司会"); log("『なるほど！』");
+
+            log("司会"); log("『皆さんも疑われないよう治療はお早めに！』"); log("");
+
+            this.learnedSigns.fang = true;
+
+            log("【新しい調査方法】"); log("『牙』の調査が可能になった。");
+
+        }
+
+        else if(this.day === 4){
+
+            log("司会"); log("『人狼特集第四回です。』"); log("");
+
+            log("博士"); log("『人狼の体温は40度以上あります！』"); log("");
+
+            log("司会"); log("『その場合は即病院に行きましょう。』"); log("");
+
+            log("博士"); log("『だから人狼なのです！』"); log("");
+
+            log("司会"); log("『体調の優れない方は早めに病院に行きましょう。』"); log("");
+
+            this.learnedSigns.temp = true;
+
+            log("【新しい調査方法】"); log("『体温』の調査が可能になった。");
+
+        }
+
+        else if(this.day === 5){
+
+            log("司会"); log("『人狼特集もいよいよ最終回です。』"); log("");
+
+            log("博士"); log("『今日は最大の特徴を紹介します。』"); log("");
+
+            log("司会"); log("『・・・とても気になりますね！』"); log("");
+
+            log("博士"); log("『覚醒した人狼には尻尾が生えます！』"); log("");
+
+            log("司会"); log("『それは見たら一発で分かりますよ』"); log("");
+
+            log("博士"); log("『だから覚醒した人狼だけです。』"); log("");
+
+            log("司会"); log("『覚醒とは初耳です。突飛な設定ですね。』"); log("");
+
+            log("博士"); log("『私は見たことがあります。』"); log("");
+
+            log("司会"); log("『本当にですか？』"); log("");
+
+            log("博士"); log("『遠吠えしてたから間違いない！』"); log("");
+
+            log("司会"); log("『それは野犬の可能性が高いですね。』"); log("");
+
+            log("司会"); log("『５日間にわたり放送しました人狼伝説、来週は雪男に関する情報を発信します！』"); log("");
+
+            this.learnedSigns.tail = true;
+
+            log("【新しい調査方法】"); log("『尻尾』の調査が可能になった。");
+
+        }
+
+        log("");
+
+        document.getElementById("output-box").scrollTop = 0;
+
+    }
+
+}
+
+const sounds = {
+
+    howl: new Audio("audio/howl.mp3"),
+
+    gun: new Audio("audio/gunshot.mp3"),
+
+    found: new Audio("audio/found.mp3"),
+
+    radio: new Audio("audio/radio.mp3")
+
+};
+
+sounds.howl.volume = 0.6;
+
+sounds.gun.volume = 0.8;
+
+sounds.found.volume = 0.5;
+
+sounds.radio.volume = 0.4;
+
+function playSE(name){
+
+    try{
+
+        sounds[name].currentTime = 0;
+
+        sounds[name].play();
+
+    }catch(e){}
+
+}
+
+let game;
+
+function getCharacterDayDialogue(character) {
+
+    const data = charactersData.find(
+
+        c => c.name === character.name
+
+    );
+
+    if (!data) {
+
+        return "……";
+
+    }
+
+    const day = game.day;
+
+    if (day > 6) {
+
+        return "……。";
+
+    }
+
+    const dialogue = data.dialogues[day];
+
+    if (typeof dialogue === "string") {
+
+        return dialogue;
+
+    }
+
+    return character.role === "wolf"
+
+        ? dialogue.creepy
+
+        : dialogue.normal;
+
+}
+
+function saveGame() {
+
+    if (!game) return;
+
+    localStorage.setItem("strange_guests_save", JSON.stringify(game));
+
+}
+
+function loadGame() {
+
+    const savedData = localStorage.getItem("strange_guests_save");
+
+    if (!savedData) return false;
+
+    try {
+
+        const parsed = JSON.parse(savedData);
+
+        game = new Game();
+
+        Object.assign(game, parsed);
+
+        game.characters = parsed.characters.map(cData => {
+
+            const c = new Character(cData.name);
+
+            Object.assign(c, cData);
+
+            return c;
+
+        });
+
+        return true;
+
+    } catch (e) {
+
+        console.error("セーブデータの読み込み失敗", e);
+
+        return false;
+
+    }
+
+}
+
+function clearSaveData() {
+
+    localStorage.removeItem("strange_guests_save");
+
+}
+
+function log(text) {
+
+    const box = document.getElementById("system-log");
+
+    box.innerHTML += text + "<br>";
+
+    const outputBox = document.getElementById("output-box");
+
+    outputBox.scrollTop = outputBox.scrollHeight;
+
+}
+
+function showDialogue(name, text) {
+
+    document.getElementById("system-log").innerHTML = "";
+
+    const nameBox =
+
+        document.getElementById("name-box");
+
+    const messageBox =
+
+        document.getElementById("message-box");
+
+    nameBox.style.display = "block";
+
+    messageBox.style.display = "block";
+
+    nameBox.textContent = name;
+
+    let cleaned = text;
+
+    if (cleaned.startsWith(name + "「")) {
+
+        cleaned = cleaned.replace(name + "「", "");
+
+    }
+
+    if (cleaned.endsWith("」")) {
+
+        cleaned = cleaned.slice(0, -1);
+
+    }
+
+    messageBox.textContent = cleaned;
+
+}
+
+function addHistory(character, text) {
+
+    if (character.dialogueHistory.includes(text))
+
+        return;
+
+    character.dialogueHistory.push(text);
+
+    const MAX_HISTORY = 10;
+
+    while (character.dialogueHistory.length > MAX_HISTORY) {
+
+        character.dialogueHistory.shift();
+
+    }
+
+}
+
+function playHowlSound() {
+
+    try {
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        const osc = audioCtx.createOscillator();
+
+        const gainNode = audioCtx.createGain();
+
+        osc.type = 'sine';
+
+        const now = audioCtx.currentTime;
+
+        osc.frequency.setValueAtTime(400, now);
+
+        osc.frequency.exponentialRampToValueAtTime(180, now + 1.2);
+
+        osc.frequency.exponentialRampToValueAtTime(260, now + 2.5);
+
+        gainNode.gain.setValueAtTime(0.01, now);
+
+        gainNode.gain.linearRampToValueAtTime(0.3, now + 0.5);
+
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.8);
+
+        osc.connect(gainNode);
+
+        gainNode.connect(audioCtx.destination);
+
+        osc.start(now);
+
+        osc.stop(now + 2.8);
+
+    } catch(e) {}
+
+}
+
+function playGunshotSound() {
+
+    try {
+
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+        const osc = ctx.createOscillator();
+
+        const gain = ctx.createGain();
+
+        osc.type = "square";
+
+        osc.frequency.setValueAtTime(80, ctx.currentTime);
+
+        gain.gain.setValueAtTime(1, ctx.currentTime);
+
+        gain.gain.exponentialRampToValueAtTime(
+
+            0.001,
+
+            ctx.currentTime + 0.15
+
+        );
+
+        osc.connect(gain);
+
+        gain.connect(ctx.destination);
+
+        osc.start();
+
+        osc.stop(ctx.currentTime + 0.15);
+
+    } catch(e){}
+
+}
+
+function playFoundSound() {
+
+try {
+
+const ctx =
+
+new (window.AudioContext ||
+
+window.webkitAudioContext)();
+
+const osc = ctx.createOscillator();
+
+const gain = ctx.createGain();
+
+osc.type = "sawtooth";
+
+osc.frequency.setValueAtTime(
+
+300,
+
+ctx.currentTime
+
+);
+
+osc.frequency.exponentialRampToValueAtTime(
+
+900,
+
+ctx.currentTime + 0.15
+
+);
+
+gain.gain.setValueAtTime(
+
+0.2,
+
+ctx.currentTime
+
+);
+
+gain.gain.exponentialRampToValueAtTime(
+
+0.001,
+
+ctx.currentTime + 0.2
+
+);
+
+osc.connect(gain);
+
+gain.connect(ctx.destination);
+
+osc.start();
+
+osc.stop(ctx.currentTime + 0.2);
+
+} catch(e){}
+
+}
+
+function playMorningHowl() {
+
+    try {
+
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+        const osc = ctx.createOscillator();
+
+        const gain = ctx.createGain();
+
+        osc.type = "triangle";
+
+        osc.frequency.setValueAtTime(
+
+            250,
+
+            ctx.currentTime
+
+        );
+
+        osc.frequency.exponentialRampToValueAtTime(
+
+            140,
+
+            ctx.currentTime + 2
+
+        );
+
+        gain.gain.setValueAtTime(
+
+            0.15,
+
+            ctx.currentTime
+
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+
+            0.0001,
+
+            ctx.currentTime + 2
+
+        );
+
+        osc.connect(gain);
+
+        gain.connect(ctx.destination);
+
+        osc.start();
+
+        osc.stop(ctx.currentTime + 2);
+
+    } catch (e) {}
+
+}
+
+let scenario = [];
+
+let scenarioIndex = 0;
+
+function startScenario(lines) {
+
+    scenario = lines;
+
+    scenarioIndex = 0;
+
+    showScenarioLine();
+
+}
+
+function showScenarioLine() {
+
+    const line = scenario[scenarioIndex];
+
+    const nameBox = document.getElementById("name-box");
+
+    const messageBox = document.getElementById("message-box");
+
+    if(line.name) {
+
+        nameBox.style.display = "block";
+
+        nameBox.textContent = line.name;
+
+    } else {
+
+        nameBox.style.display = "none";
+
+    }
+
+    messageBox.style.display = "block";
+
+    messageBox.textContent = line.text;
+
+}
+
+function nextScenario() {
+
+    scenarioIndex++;
+
+    if(scenarioIndex >= scenario.length) {
+
+        proceedToMainGame();
+
+        return;
+
+    }
+
+    showScenarioLine();
+
+}
+
+window.onload = function() {
+
+    document.getElementById("titleBtnHeader").onclick = () => {
+
+        if(game) saveGame();
+
+        showTitleScreen();
+
+    };
+
+    showTitleScreen();
+
+};
+
+function showTitleScreen() {
+
+    document.getElementById("day-text").textContent = "";
+
+    document.getElementById("time-display").textContent = "";
+
+    document.getElementById("system-log").innerHTML = "";
+
+    document.getElementById("name-box").style.display = "none";
+
+    const msgBox = document.getElementById("message-box");
+
+    msgBox.style.display = "block";
+
+    msgBox.textContent = "誰も信じるべきではない、自分さえ信じるに値しない";
+
+    document.getElementById("view-area").innerHTML = `
+
+        <div>
+
+            <div class="location-title">氷雪の人狼</div>
+
+        </div>
+
+        <div class="characters-stage"></div>
+
+    `;
+
+    // セーブデータから日付を取得
+
+    let savedDayText = "続きから";
+
+    const savedData = localStorage.getItem("strange_guests_save");
+
+    if (savedData) {
+
+        try {
+
+            const parsed = JSON.parse(savedData);
+
+            if (parsed && parsed.day) {
+
+                savedDayText = `続きから（${parsed.day}日目）`;
+
+            }
+
+        } catch (e) {
+
+            console.error("セーブデータのパース失敗", e);
+
+        }
+
+    }
+
+    const panel = document.getElementById("control-panel");
+
+    panel.innerHTML = `
+
+        <button id="startBtn" class="primary-btn full-width">はじめから</button>
+
+        <button id="continueBtn" class="full-width">${savedDayText}</button>
+
+    `;
+
+    document.getElementById("startBtn").onclick = startNewGame;
+
+    const continueBtn = document.getElementById("continueBtn");
+
+    if (savedData) {
+
+        continueBtn.onclick = () => {
+
+            if (loadGame()) updateUI();
+
+        };
+
+    } else {
+
+        continueBtn.disabled = true;
+
+        continueBtn.style.opacity = "0.5";
+
+    }
+
+}
+
+function startNewGame() {
+
+    playSE("howl");
+
+    clearSaveData();
+
+    game = new Game();
+
+    showDayZeroEvent();
+
+}
+
+function showDayZeroEvent() {
+
+    document.getElementById("system-log").innerHTML = "";
+
+    document.getElementById("message-box").classList.add("novel-message");
+
+    document.getElementById("day-text").textContent = "PROLOGUE";
+
+    document.getElementById("time-display").textContent = "【吹雪の夜】";
+
+    const viewArea = document.getElementById("view-area");
+
+    viewArea.innerHTML = `
+
+        <div>
+
+            <div class="location-title">管理人室 (事件前夜)</div>
+
+            <div class="status-info" style="margin-top: 3px;">その体は恐ろしいほど冷たかった</div>
+
+        </div>
+
+    `;
+
+    const prologue = [
+
+        {name:"", text:"吹雪の夜。"},
+
+        {name:"", text:"あなたは伯父の経営するペンションを訪れた。"},
+
+        {name:"伯父", text:"おう、よく来たな。"},
+
+        {name:"あなた", text:"伯父さん久しぶり。"},
+
+        {name:"伯父", text:"前に会ったのは五年くらい前だったか？"},
+
+        {name:"あなた", text:"それくらいになるね。"},
+
+        {name:"伯父", text:"お前もすっかり大人になったな。"},
+
+        {name:"あなた", text:"伯父さんこそ元気そうで安心したよ。"},
+
+        {name:"伯父", text:"腰は痛いがな。このペンションはまだまだ続けるつもりだ。"},
+
+        {name:"あなた", text:"相変わらずここは繁盛してるみたいだね。"},
+
+        {name:"伯父", text:"ありがたい話だが、最近は妙な噂もあってな。"},
+
+        {name:"あなた", text:"妙な噂？"},
+
+        {name:"伯父", text:"ラジオで聞いたんだが、この辺で人狼が出たんだとよ。"},
+
+        {name:"伯父", text:"群れでやってきて夜になると人を襲うらしい。"},
+
+        {name:"あなた", text:"人狼なんて空想の生き物だろ？"},
+
+        {name:"伯父", text:"俺もそう思うが、近くの村で犠牲者が出たって話だ。"},
+
+        {name:"伯父", text:"まあここにやって来ても猟銃でズドンさ。"},
+
+        {name:"あなた", text:"でも化けてやって来るなら誰が人狼か判断付かないね。"},
+
+        {name:"伯父", text:"その通り。しかも連中は嘘を並べて信用させようとするんだと。"},
+
+        {name:"伯父", text:"だが、体のどこかに異常が見つかるらしい。"},
+
+        {name:"あなた", text:"じゃあ、その異常を見つけたら人狼ってわけだ。"},
+
+        {name:"伯父", text:"いや、異常は複数あるようだ。それで誤って人間を撃った例もあるらしい。"},
+
+        {name:"伯父", text:"じっくり調査すれば見抜けるらしいが、体力を消耗して何度もできるものじゃない。"},
+
+        {name:"伯父", text:"怪しい奴なら、より慎重に調べることだ。"},
+
+        {name:"あなた", text:"なるほど、覚えておくよ。"},
+
+        {name:"伯父", text:"念のためだが猟銃は管理人室に置いてある。"},
+
+        {name:"伯父", text:"昔お前に見せたことがあるだろ？"},
+
+        {name:"伯父", text:"ただ、この吹雪で補給路が塞がれていてな。"},
+
+        {name:"伯父", text:"撃てても１日１発が限度だ。"},
+
+        {name:"伯父", text:"だから引き金を引く時は慎重にな。"},
+
+        {name:"あなた", text:"分かったよ、それも覚えておく。"},
+
+        {name:"伯父", text:"よし、そろそろ飯にしよう。シチュー好きだったろ？"},
+
+        {name:"", text:"その夜。"},
+
+        {name:"", text:"あなたは部屋へ戻り眠りについた。"},
+
+        {name:"", text:"伯父の語った人狼の話が頭から離れなかった。"},
+
+        {name:"", text:"だが疲れていたあなたは、やがて眠りに落ちた。"},
+
+        {name:"", text:"・・・・・・"},
+
+        {name:"", text:"・・・・"},
+
+        {name:"", text:"・・"},
+
+        {name:"", text:"翌朝。"},
+
+        {name:"", text:"どこからか悲鳴が聞こえた。"},
+
+        {name:"", text:"あなたは慌てて部屋を飛び出した。"},
+
+        {name:"", text:"ロビーには客人たちが集まっている。"},
+
+        {name:"", text:"そして、その中央には―――――"},
+
+        {name:"", text:"伯父が無残な姿で倒れていた。"},
+
+        {name:"", text:"体には引き裂かれたような痛々しい傷が残されていた。"},
+
+        {name:"", text:"空想の人狼がそんな、まさか・・・。"},
+
+        {name:"", text:"吹雪は激しさを増している。"},
+
+        {name:"", text:"このままでは第２、第３の犠牲者が出るだろう。"},
+
+        {name:"", text:"幸い、あなたの手元には猟銃がある。"},
+
+        {name:"", text:"撃ち殺してでも止めるしかない。"},
+
+        {name:"", text:"だが人間のふりをする化け物など本当に見つけられるのか。"},
+
+        {name:"", text:"間違って人間を撃ってしまったら……？"},
+
+        {name:"", text:"だが、伯父のためにもやるしかない。"},
+
+        {name:"", text:"やるしかないんだ・・・"}
+
+    ];
+
+    startScenario(prologue);
+
+    playSE("howl");
+
+    const panel = document.getElementById("control-panel");
+
+    panel.innerHTML = `
+
+        <button class="primary-btn full-width" onclick="proceedToMainGame()">プロローグをスキップ</button>
+
+    `;
+
+    document.getElementById("message-box").onclick = nextScenario;
+
+}
+
+function proceedToMainGame() {
+
+    document.getElementById("message-box").classList.remove("novel-message");
+
+    document.getElementById("name-box").style.display = "none";
+
+    document.getElementById("message-box").style.display = "none";
+
+    document.getElementById("system-log").innerHTML = "";
+
+    log("吹雪に閉ざされたペンション。人狼捜索を開始する。\n");
+
+    saveGame();
+
+    updateUI();
+
+}
+
+function updateUI() {
+
+    if (game.isGameOver) return;
+
+    document.getElementById("day-text").textContent = `DAY ${game.day}`;
+
+    document.getElementById("time-display").textContent = `【${game.timeState}】`;
+
+const remain =
+
+    game.maxInvestigationLimit -
+
+    game.investigationCount;
+
+let meterHTML =
+
+    '<div class="investigation-meter">';
+
+for(let i=0;i<game.maxInvestigationLimit;i++){
+
+    meterHTML += `
+
+        <div class="
+
+            investigation-cell
+
+            ${i < remain ? "active" : ""}
+
+        "></div>
+
+    `;
+
+}
+
+meterHTML += '</div>';
+
+    const viewArea = document.getElementById("view-area");
+
+    viewArea.innerHTML = `
+
+    <div>
+
+        <div style="
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+">
+
+    <div class="location-title">
+
+        ${game.playerLocation}
+
+    </div>
+
+    <div style="
+
+        display:flex;
+
+        align-items:center;
+
+        gap:8px;
+
+        font-size:0.8rem;
+
+        color:#ffaa00;
+
+        font-weight:bold;
+
+    ">
+
+        <span>調査回数：</span>
+
+        ${meterHTML}
+
+    </div>
+
+</div>
+
+        <div class="status-info" style="margin-top:3px;">
+
+            銃弾:${game.shotLimit}発
+
+        </div>
+
+    </div>
+
+    <div class="characters-stage"
+
+         id="characters-stage">
+
+    </div>
+
+`;
+
+    const stage = document.getElementById("characters-stage");
+
+    const presentPeople = game.getCharactersAtLocation(game.playerLocation);
+
+    if (presentPeople.length === 0) {
+
+        if (game.playerLocation !== "管理人室") {
+
+            stage.innerHTML = `<div style="color: #777; font-size: 0.8rem; padding: 10px;">ここには誰もいない……。</div>`;
+
+        } else {
+
+            stage.innerHTML = ``;
+
+        }
+
+    } else {
+
+        presentPeople.forEach(c => {
+
+            const card = document.createElement("div");
+
+            card.className = "chara-card";
+
+            card.innerHTML = `
+
+                <div class="chara-avatar">${c.name[0]}</div>
+
+                <div class="chara-name">${c.name}</div>
+
+                <div class="chara-actions">
+
+                <button onclick="talkCharacter('${c.name}')">会話</button>
+
+                <button onclick="inspectCharacter('${c.name}')">調査</button>
+
+                </div>
+
+            `;
+
+            stage.appendChild(card);
+
+        });
+
+    }
+
+    renderControls();
+
+}
+
+function renderControls() {
+
+    const panel = document.getElementById("control-panel");
+
+    panel.innerHTML = "";
+
+    const moveBtn = document.createElement("button");
+
+    moveBtn.textContent = "🗺️ 間取り図";
+
+    moveBtn.onclick = showPensionMap;
+
+    panel.appendChild(moveBtn);
+
+    if (game.playerLocation === "管理人室") {
+
+        const radioBtn = document.createElement("button");
+
+        if(game.radioListenedToday) {
+
+            radioBtn.textContent = "📻 聴取済み";
+
+            radioBtn.disabled = true;
+
+            radioBtn.style.opacity = "0.5";
+
+        } else {
+
+            radioBtn.textContent = "📻 ラジオ";
+
+            radioBtn.onclick = () => {
+
+                game.playRadioBroadcast();
+
+                game.radioListenedToday = true;
+
+                saveGame();
+
+                updateUI();
+
+            };
+
+        }
+
+        panel.appendChild(radioBtn);
+
+        const mirrorBtn = document.createElement("button");
+
+        mirrorBtn.textContent = "🪞 鏡を見る";
+
+        mirrorBtn.onclick = showMirrorMenu;
+
+        panel.appendChild(mirrorBtn);
+
+const phoneBtn = document.createElement("button");
+
+if(game.day === 1 && !game.phoneUsedToday){
+
+    phoneBtn.textContent = "📞 救助要請";
+
+    phoneBtn.onclick = firstDayPhoneEvent;
+
+}else{
+
+    phoneBtn.textContent = "📞 電話";
+
+    phoneBtn.disabled = true;
+
+    phoneBtn.style.opacity = "0.5";
+
+}
+
+panel.appendChild(phoneBtn);
+
+        const sleepBtn = document.createElement("button");
+
+        sleepBtn.textContent = "🌙 眠る";
+
+        sleepBtn.onclick = () => {
+
+    if(game.day === 1 && !game.phoneUsedToday){
+
+        log("\n救助要請がまだだ。");
+
+        return;
+
+    }
+
+    if(!game.hasExecutedToday &&
+
+       !confirm("今日誰も処刑していません。眠りますか？"))
+
+        return;
+
+    log("\nベッドに入った。\n");
+
+    game.startNight();
+
+};
+
+        panel.appendChild(sleepBtn);
+
+    }
+
+    const memoBtn = document.createElement("button");
+
+    memoBtn.textContent = "📝 メモ";
+
+    memoBtn.onclick = showMemo;
+
+    panel.appendChild(memoBtn);
+
+const hunterAlive =
+
+    game.characters.some(
+
+        c => c.role === "hunter" && c.alive
+
+    );
+
+if(game.hunterRevealed && hunterAlive) {
+
+    const guardBtn =
+
+        document.createElement("button");
+
+    if(game.hunterOrderGivenToday){
+
+        guardBtn.textContent = "🛡️ 指示済み";
+
+        guardBtn.disabled = true;
+
+        guardBtn.style.opacity = "0.5";
+
+    } else {
+
+        guardBtn.textContent = "🛡️ 護衛指示";
+
+        guardBtn.onclick = showHunterGuardMenu;
+
+    }
+
+    panel.appendChild(guardBtn);
+
+}
+
+}
+
+function getCharacterHistoryHTML(c) {
+
+    if (c.dialogueHistory.length === 0) return `<div class="char-history-box">（履歴なし）</div>`;
+
+    let html = `<div class="char-history-box"><strong>【${c.name}】</strong><br>`;
+
+    c.dialogueHistory.forEach(t => html += `・${t}<br>`);
+
+    return html + `</div>`;
+
+}
+
+function talkCharacter(name){
+
+    const c = game.characters.find(x => x.name === name);
+
+    if(!c) return;
+
+    const intro =
+
+        CHARACTER_DIALOGUES[c.name]?.talk ||
+
+        `${c.name}「どうした？」`;
+
+    showDialogue(c.name, intro);
+
+    openTalkMenu(name);
+
+}
+
+function inspectCharacter(name){
+
+    const c = game.characters.find(x => x.name === name);
+
+    if(!c) return;
+
+    const intro =
+
+        CHARACTER_DIALOGUES[c.name]?.inspect ||
+
+        `${c.name}「……何だ？」`;
+
+    showDialogue(c.name, intro);
+
+    openInspectMenu(name);
+
+}
+
+function openTalkMenu(name) {
+
+    const c = game.characters.find(x => x.name === name);
+
+    if (!c) return;
+
+    const panel = document.getElementById("control-panel");
+
+    panel.innerHTML = getCharacterHistoryHTML(c);
+
+    const btnStory = document.createElement("button");
+
+    btnStory.textContent =
+
+        game.day === 1
+
+            ? "来訪理由"
+
+            : "今日の会話";
+
+    btnStory.onclick = () => {
+
+        showDialogue(
+
+            c.name,
+
+            getCharacterDayDialogue(c)
+
+        );
+
+        addHistory(
+
+            c,
+
+            `DAY${game.day} 会話`
+
+        );
+
+        c.lastTalkDay = game.day;
+
+        saveGame();
+
+    };
+
+    panel.appendChild(btnStory);
+
+    const btn1 = document.createElement("button");
+
+    btn1.textContent = "昨日の居場所";
+
+    btn1.onclick = () => {
+
+        const dialogues = CHARACTER_DIALOGUES[c.name];
+
+        const logText =
+
+            dialogues
+
+                ? dialogues.alibi(c.fakeYesterdayLocation)
+
+                : `${c.name}「昨日はずっと${c.fakeYesterdayLocation}にいたよ」`;
+
+        showDialogue(c.name, logText);
+
+        addHistory(
+
+            c,
+
+            `昨日：${c.fakeYesterdayLocation}にいた`
+
+        );
+
+        saveGame();
+
+    };
+
+    panel.appendChild(btn1);
+
+    const btn2 = document.createElement("button");
+
+    btn2.textContent = "目撃証言";
+
+    btn2.onclick = () => {
+
+        const dialogues = CHARACTER_DIALOGUES[c.name];
+
+        const logText =
+
+            dialogues
+
+                ? dialogues.witness(
+
+                    c.witnessTarget,
+
+                    c.witnessLocation
+
+                )
+
+                : "目撃証言なし";
+
+        showDialogue(c.name, logText);
+
+        addHistory(
+
+            c,
+
+            c.witnessTarget
+
+                ? `目撃：${c.witnessTarget}（${c.witnessLocation}）`
+
+                : "目撃：なし"
+
+        );
+
+        saveGame();
+
+    };
+
+    panel.appendChild(btn2);
+
+    const cancelBtn = document.createElement("button");
+
+    cancelBtn.textContent = "戻る";
+
+    cancelBtn.onclick = updateUI;
+
+    panel.appendChild(cancelBtn);
+
+}
+
+function openInspectMenu(name) {
+
+    const c = game.characters.find(x => x.name === name);
+
+    if (!c) return;
+
+    const panel = document.getElementById("control-panel");
+
+    panel.innerHTML = getCharacterHistoryHTML(c);
+
+    const allSigns = [
+
+        { key:"eye", label:"眼" },
+
+        { key:"claw", label:"爪" },
+
+        { key:"fang", label:"牙" },
+
+        { key:"temp", label:"体温" },
+
+        { key:"tail", label:"尻尾" }
+
+    ];
+
+    allSigns.forEach(sign => {
+
+        if(!game.learnedSigns[sign.key]) return;
+
+        const btn = document.createElement("button");
+
+        btn.textContent = sign.label;
+
+        btn.onclick = () => {
+
+            game.investigate(c, sign.key);
+
+            if(!game.hasFoundAbnormalToday) openInspectMenu(c.name);
+
+        };
+
+        panel.appendChild(btn);
+
+    });
+
+    const cancelBtn = document.createElement("button");
+
+    cancelBtn.textContent = "戻る";
+
+    cancelBtn.onclick = updateUI;
+
+    panel.appendChild(cancelBtn);
+
+}
+
+function showAbnormalFoundMenu(targetChar) {
+
+    const panel = document.getElementById("control-panel");
+
+    panel.innerHTML = `<div class="char-history-box" style="color:#ff5555;"><strong>【${targetChar.name}に異常発見！】</strong></div>`;
+
+    const execBtn = document.createElement("button");
+
+    if(game.hasExecutedToday) {
+
+        execBtn.textContent = "本日発砲済み";
+
+        execBtn.disabled = true;
+
+        execBtn.style.opacity = "0.5";
+
+    } else {
+
+        execBtn.className = "primary-btn";
+
+        execBtn.textContent = "処刑する";
+
+        execBtn.onclick = () => game.execution(targetChar);
+
+    }
+
+    panel.appendChild(execBtn);
+
+    const cancelBtn = document.createElement("button");
+
+    cancelBtn.textContent = "見逃す";
+
+    cancelBtn.onclick = () => {
+
+        log(`${targetChar.name}を見逃した。`);
+
+        game.hasFoundAbnormalToday = false;
+
+        saveGame();
+
+        updateUI();
+
+    };
+
+    panel.appendChild(cancelBtn);
+
+}
+
+function showPensionMap() {
+
+    const existingModal = document.querySelector('.modal-overlay');
+
+    if (existingModal) existingModal.remove();
+
+    const modal = document.createElement('div');
+
+    modal.className = 'modal-overlay';
+
+    const mapBox = document.createElement("div");
+
+    mapBox.className = "pension-map";
+
+    mapBox.appendChild(createFloorRow("2階", ["図書室", "展望テラス"]));
+
+    mapBox.appendChild(createFloorRow("1階", ["ロビー", "食堂", "暖炉前"]));
+
+    mapBox.appendChild(createFloorRow("地下",["ボイラー室", "倉庫"]));
+
+    const managerBtn = document.createElement("button");
+
+    managerBtn.textContent = "管理人室";
+
+    managerBtn.className = "full-width";
+
+    managerBtn.style.marginTop = "10px";
+
+    if (game.playerLocation === "管理人室") {
+
+        managerBtn.classList.add("current");
+
+    } else {
+
+        managerBtn.onclick = () => {
+
+            game.movePlayer("管理人室");
+
+            modal.remove();
+
+        };
+
+    }
+
+    mapBox.appendChild(managerBtn);
+
+    modal.appendChild(mapBox);
+    document.getElementById('game-container').appendChild(modal);
+}
+function createFloorRow(floorName, locations) {
+    const row = document.createElement("div");
+    row.className = "map-floor-row";
+    const label = document.createElement("div");
+    label.className = "map-floor-label";
+    label.textContent = floorName;
+    row.appendChild(label);
+    const grid = document.createElement("div");
+    grid.className = "map-grid-row";
+    grid.style.gridTemplateColumns = `repeat(${locations.length}, 1fr)`;
+    locations.forEach(loc => {
+        const node = document.createElement("div");
+        node.className = "map-node";
+        if (loc === game.playerLocation) {
+            node.classList.add("current");
+            node.textContent = loc;
+        } else {
+            node.textContent = loc;
+
+            node.onclick = () => {
+
+                game.movePlayer(loc);
+
+                document.querySelector('.modal-overlay').remove();
+
+            };
+
+        }
+
+        grid.appendChild(node);
+
+    });
+
+    row.appendChild(grid);
+
+    return row;
+
+}
+
+function showHunterGuardMenu() {
+
+    const panel = document.getElementById("control-panel");
+
+    panel.innerHTML = `<div class="char-history-box" style="color:#55ff55;"><strong>【護衛対象を選択】</strong></div>`;
+
+    game.getAlive().forEach(c => {
+
+        const hunter = game.characters.find(x => x.role === "hunter");
+
+        if(c.name === "あなた" || (hunter && c.name === hunter.name)) return;
+
+        const btn = document.createElement("button");
+
+        btn.textContent = c.name;
+
+        btn.onclick = () => {
+
+            game.hunterGuardTarget = c.name;
+            game.hunterOrderGivenToday = true;
+
+            log(`\n${c.name}を護衛対象に指定した。\n`);
+
+            saveGame();
+
+            updateUI();
+
+        };
+
+        panel.appendChild(btn);
+
+    });
+
+    const cancelBtn = document.createElement("button");
+
+    cancelBtn.textContent = "戻る";
+
+    cancelBtn.onclick = updateUI;
+
+    panel.appendChild(cancelBtn);
+
+}
+
+function showMirrorMenu() {
+
+    const panel = document.getElementById("control-panel");
+
+    panel.innerHTML = `<div class="char-history-box"><strong>【鏡】自分の状態を確認する</strong></div>`;
+
+    const player = game.characters.find(c => c.name === "あなた");
+
+    const choices = [
+
+        { key:"eye", label:"眼" },
+
+        { key:"claw", label:"爪" },
+
+        { key:"fang", label:"牙" },
+
+        { key:"temp", label:"体温" },
+
+        { key:"tail", label:"尻尾" }
+
+    ];
+
+    choices.forEach(sign => {
+
+        if(!game.learnedSigns[sign.key]) return;
+
+        const btn = document.createElement("button");
+
+        btn.textContent = sign.label;
+
+        btn.onclick = () => {
+
+            game.investigate(player, sign.key);
+            showMirrorMenu();
+        };
+        panel.appendChild(btn);
+    });
+    const stopBtn = document.createElement("button");
+    stopBtn.textContent = "戻る";
+    stopBtn.onclick = updateUI;
+    panel.appendChild(stopBtn);
+}
+function firstDayPhoneEvent(){
+    if(game.phoneUsedToday) return;
+    const phoneScenario = [
+        {name:"山岳救助管理局", text:"こちら山岳救助管理局です。"},
+        {name:"山岳救助管理局", text:"緊急通信を受理しました。"},
+        {name:"山岳救助管理局", text:"状況を報告してください。"},
+        {name:"あなた", text:"ペンションの管理人が何者かに襲われ死亡しました。"},
+        {name:"あなた", text:"現在、生存者は14名です。"},
+        {name:"あなた", text:"救助を要請します。"},
+        {name:"山岳救助管理局", text:"了解しました。"},
+        {name:"山岳救助管理局", text:"しかし現在、吹雪のため現地への接近は不可能です。"},
+        {name:"山岳救助管理局", text:"気象予測では約7日後に天候回復が見込まれています。"},
+        {name:"山岳救助管理局", text:"それまで建物内で待機してください。"},
+        {name:"山岳救助管理局", text:"また周辺地域では相次ぐ不審死が報告されています。"},
+        {name:"山岳救助管理局", text:"十分注意してください。"},
+        {name:"", text:"通信終了。"},
+    ];
+    scenario = phoneScenario;
+    scenarioIndex = 0;
+    showScenarioLine();
+    document.getElementById("control-panel").innerHTML = `
+
+    <button class="full-width" disabled>
+        📞 通話中...
+    </button>
+`;
+
+    document.getElementById("message-box").onclick = function(){
+
+        scenarioIndex++;
+
+        if(scenarioIndex >= scenario.length){
+
+            game.phoneUsedToday = true;
+
+            document.getElementById("name-box").style.display = "none";
+
+            document.getElementById("message-box").style.display = "none";
+
+            saveGame();
+
+            updateUI();
+
+            return;
+
+        }
+
+        showScenarioLine();
+
+    };
+
+}
+
+function showMemo() {
+
+    log("\n========== 調査メモ ==========");
+
+    const labels = { eye:"眼", claw:"爪", fang:"牙", temp:"体温", tail:"尻尾" };
+
+    // 死亡した人物の調査記録を消去
+
+    game.characters.forEach(c => {
+
+        if (!c.alive) {
+
+            c.knownSigns = { eye: null, claw: null, fang: null, temp: null, tail: null };
+
+            c.memo.inspected = {};
+
+        }
+
+    });
+
+    let found = false;
+
+    game.characters.forEach(c => {
+
+        if(c.name === "あなた" || !c.alive) return;
+
+        let results = [];
+
+        Object.keys(c.knownSigns).forEach(key => {
+            if(c.knownSigns[key] !== null) {
+                results.push(`${labels[key]}:${c.knownSigns[key] ? "異常あり" : "異常なし"}`);
+            }
+        });
+        if(results.length > 0) {
+            found = true;
+            log(`・${c.name} → ${results.join(" / ")}`);
+        }
+    });
+    if(!found) log("（調査記録なし）");
+    const alive = game.characters.filter(c => c.alive && c.name !== "あなた").map(c => c.name);
+    log(`\n【生存者】(${alive.length}名)\n${alive.length === 0 ? "なし" : alive.join("、")}`);
+    const dead = game.characters.filter(c => !c.alive && c.name !== "あなた").map(c => {
+        const side = (c.role === "wolf") ? "人狼" : "市民";
+        return `${c.name}（${side}）`;
+    });
+    log(`\n【死亡者】(${dead.length}名)\n${dead.length === 0 ? "なし" : dead.join("、")}`);
+    if(game.hunterGuardTarget) log(`\n【護衛情報】\n現在の護衛対象：${game.hunterGuardTarget}`);
+    log("============================\n");
+}
+function showGameOverControls() {
+    const panel = document.getElementById("control-panel");
+
+    panel.innerHTML = `
+
+        <button class="primary-btn full-width" onclick="showTitleScreen()">タイトルへ戻る</button>
+    `;
+}
+</script>
+</body></html>
